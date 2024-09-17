@@ -2,7 +2,8 @@ const express = require('express');
 const app = express(); 
 
 const listaProdutos = [];
-
+app.use(express.json()); 
+//Função para validar informações à respeito do novo produto cadastrado. 
 function validationNewProduct(nome, descricao,marca,categoria,subcategoria,unidade_medida,quantidade_estoque,ponto_reposicao,preco_custo,preco_venda,data_validade,fornecedor,res){
     //Validação de dados - subcategoria, ponto_reposicao e fornecedor são opcionais. 
     if(!nome || !descricao || !marca || !categoria || !unidade_medida || !quantidade_estoque || !preco_custo || !preco_venda || !data_validade){
@@ -21,14 +22,12 @@ function validationNewProduct(nome, descricao,marca,categoria,subcategoria,unida
     }
 }
 
-app.use(express.json()); 
-
 //Endpoint para cadastrar novos produtos:
 app.post('/produtos', (req,res)=>{
     const {nome, descricao,marca,categoria,subcategoria,unidade_medida,quantidade_estoque,ponto_reposicao,preco_custo,preco_venda,data_validade,fornecedor} = req.body;
 
     const validationResponse = validationNewProduct
-(nome, descricao,marca,categoria,subcategoria,unidade_medida,quantidade_estoque,ponto_reposicao,preco_custo,preco_venda,data_validade,fornecedor,res); 
+    (nome, descricao,marca,categoria,subcategoria,unidade_medida,quantidade_estoque,ponto_reposicao,preco_custo,preco_venda,data_validade,fornecedor,res); 
 
     if(validationResponse) return;
     
@@ -49,9 +48,18 @@ app.post('/produtos', (req,res)=>{
         fornecedor
     }
 
-    listaProdutos.push(novoProduto); 
-    res.status(201).json({message:"Produto cadastrado com sucesso", produto:novoProduto}); 
-})
+    const produtoExiste = listaProdutos.find(produto=> produto.nome === nome); 
+    if(produtoExiste){
+        return res.status(409).json({message:"Este produto já foi cadastrado."})
+    }else{
+        listaProdutos.push(novoProduto); 
+        res.status(201).json({message:"Produto cadastrado com sucesso.", produto:novoProduto}); 
+    }
+
+
+}); 
+
+
 const port = 3003; 
 app.listen(port, ()=>{
     console.log('Server runing...')
