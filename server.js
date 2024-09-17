@@ -59,6 +59,18 @@ app.post('/produtos', (req,res)=>{
 
 }); 
 
+app.get('/produtos/:id', (req,res)=>{
+    const idProduto = parseInt(req.params.id); 
+    const produtoExiste = listaProdutos.find(produto=> produto.id === idProduto); 
+
+    if(produtoExiste){
+        return res.status(200).json({mensagem:"Dados do produto:" , produto:produtoExiste});
+    }else{
+        return res.status(404).json({mensagem:"O produto não existe."})
+    }
+});
+ 
+
 
 const port = 3003; 
 app.listen(port, ()=>{
