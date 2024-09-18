@@ -59,6 +59,7 @@ app.post('/produtos', (req,res)=>{
 
 }); 
 
+//Endpoint para listar um produto através do seu ID. 
 app.get('/produtos/:id', (req,res)=>{
     const idProduto = parseInt(req.params.id); 
     const produtoExiste = listaProdutos.find(produto=> produto.id === idProduto); 
@@ -69,7 +70,23 @@ app.get('/produtos/:id', (req,res)=>{
         return res.status(404).json({mensagem:"O produto não existe."})
     }
 });
- 
+
+//Endpoint para listar todos os produtos cadastrados com paginação:
+
+app.get('/produtos', (req,res)=>{
+    const pagina = parseInt(req.query.pagina) || 1; 
+    const tamanhoPagina = parseInt(req.query.tamanhoPagina) || 10; 
+    const inicio = (pagina-1)*tamanhoPagina;
+    const fim = inicio + tamanhoPagina;
+    const produtosPaginados = listaProdutos.slice(inicio,fim);
+
+    // res.header('X-Total-Count', listaProdutos.lenght);
+    res.json(produtosPaginados); 
+})
+
+
+
+
 
 
 const port = 3003; 
